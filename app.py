@@ -7,8 +7,12 @@ from tensorflow.keras.models import load_model
 
 # Inicializa Flask
 app = Flask(__name__)
-UPLOAD_FOLDER = 'static/uploads'
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Crear carpeta si no existe
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 # Cargar modelo
 MODEL_PATH = 'Cow_classifier_python_final.h5'
@@ -51,7 +55,4 @@ def predict():
         return render_template('index.html', predictions=results, filename=filename)
 
 if __name__ == '__main__':
-    # Crear carpeta si no existe
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
     app.run(debug=True)
