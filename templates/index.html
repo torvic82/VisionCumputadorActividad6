@@ -2,42 +2,135 @@
 <html>
 <head>
     <title>Clasificador de Vacas</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+     
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+            text-align: center; /* Centra todo el texto en el body */
+        }
+
+        .header-container {
+            margin: 0 auto; /* Centra el contenedor */
+            max-width: 800px; /* Ancho máximo para mejor legibilidad */
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #333;
+            margin: 0 auto; /* Centra los títulos */
+        }
+
+        form {
+            margin: 30px auto; /* Centra el formulario */
+            width: fit-content; /* Ajusta el ancho al contenido */
+            text-align: left; /* Alinea el texto del formulario a la izquierda */
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto; /* Centra el contenedor de progreso */
+        }
+
+        .progress-bar {
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            text-align: left; /* Alinea las etiquetas a la izquierda */
+        }
+
+        .progress-fill {
+            height: 24px;
+            line-height: 24px;
+            background-color: #4CAF50;
+            text-align: left;
+            color: white;
+            padding-left: 10px;
+            border-radius: 8px 0 0 8px;
+        }
+
+        img {
+            margin: 30px auto; /* Centra la imagen */
+            display: block; /* Necesario para que funcione margin auto */
+            max-width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        input[type="file"] {
+            padding: 6px;
+            margin: 10px 0;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #1976D2;
+        }
+
+        .results-section {
+            text-align: center; /* Centra la sección de resultados */
+            margin: 30px auto;
+            max-width: 800px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
-<body class="bg-light">
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Clasificador de Razas de Vacas</h2>
-    <h4 class="text-center mb-4">Por Juan David Corrales y Victor Tamayo</h4>
-    <form method="post" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="images" class="form-label">Selecciona imágenes (.jpg, .jpeg, .png)</label>
-            <input class="form-control" type="file" name="images" accept="image/*" multiple required>
-        </div>
-        <button type="submit" class="btn btn-primary">Clasificar Imágenes</button>
+<body>
+    <div class="header-container">
+        <h1>Clasificador de Razas de Vacas - Actividad 6</h1>
+        <h4>Por Juan Corrales y Victor Tamayo</h4>
+    </div>
+
+    <form action="/predict" method="post" enctype="multipart/form-data">
+        <label for="file">Seleccione una imagen:</label><br>
+        <input type="file" name="file" id="file" required>
+        <br>
+        <input type="submit" value="Clasificar">
     </form>
 
-    {% if results %}
-        <h4 class="mt-5">Resultados:</h4>
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>Imagen</th>
-                    <th>Clase Predicha</th>
-                    <th>Confianza</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in results %}
-                    <tr>
-                        <td>{{ row.filename }}</td>
-                        <td>{{ row.predicted_class }}</td>
-                        <td>{{ row.confidence }}</td>
-                    </tr>
+    {% if predictions %}
+        <div class="results-section">
+            <h2>Resultados:</h2>
+            <div class="progress-container">
+                {% for class_name, prob in predictions %}
+                    <div class="progress-label">{{ class_name }} — {{ '%.2f' % (prob * 100) }}%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ prob * 100 }}%;">
+                            {{ '%.2f' % (prob * 100) }}%
+                        </div>
+                    </div>
                 {% endfor %}
-            </tbody>
-        </table>
-        <a href="{{ url_for('download_csv', csv_path=csv_path) }}" class="btn btn-success">Descargar CSV</a>
+            </div>
+
+            {% if filename %}
+                <h3>Imagen cargada:</h3>
+                <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Imagen cargada">
+            {% endif %}
+        </div>
     {% endif %}
-</div>
 </body>
 </html>
